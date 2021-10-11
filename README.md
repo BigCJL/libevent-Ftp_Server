@@ -27,23 +27,23 @@ Xtask类是所有任务都依赖的基类，定义了成员	:
 ### XFtpTask类
 * 继承了XTask类，定义了成员:
 * public:
-* struct bufferevent* cmdbev = 0;
-* virtual void Parse(std::string type, std::string msg){}
-	//回复cmd消息
-* void ResCMD(std::string msg);
-* virtual void Read(struct bufferevent *bev){}
-* virtual void Write(struct bufferevent* bev) {}
-* virtual void Event(struct bufferevent* bev, short what) {}
-* void SetCallback(struct bufferevent* bev);
-* bool Init() { return true; }
+	* struct bufferevent* cmdbev = 0;
+	* virtual void Parse(std::string type, std::string msg){}
+		//回复cmd消息
+	* void ResCMD(std::string msg);
+	* virtual void Read(struct bufferevent *bev){}
+	* virtual void Write(struct bufferevent* bev) {}
+	* virtual void Event(struct bufferevent* bev, short what) {}
+	* void SetCallback(struct bufferevent* bev);
+	* bool Init() { return true; }
 * protected:
-* static void ReadCB(bufferevent* bev, void* arg);
-* static void WriteCB(bufferevent* bev, void* arg);
-* static void EventCB(struct bufferevent* bev, short what, void* arg);
-    cmdbev主要在派生类XFtpServerCMD中用到，服务器子线程收到消息时，在已经注册的calls字典里查找有无type类型，若查找到了，则调用相应对象中的方法解析(parse)请求（多态的应用），并在服务端完成响应。
-    Parse方法，是虚函数，不同的请求头对应了不同的解析方法，因此需要各任务派生类重写。
-    ResCMD方法，若calls里没有注册该请求，则回复一个OK 200
-    Read、Write、Event和SetCallback相当于封装了libevent里的setcb函数，设置为虚函数，让不同功能的子类只需要继承父类，再实现不同的回调函数即可。
+	* static void ReadCB(bufferevent* bev, void* arg);
+	* static void WriteCB(bufferevent* bev, void* arg);
+	* static void EventCB(struct bufferevent* bev, short what, void* arg);
+  *    cmdbev主要在派生类XFtpServerCMD中用到，服务器子线程收到消息时，在已经注册的calls字典里查找有无type类型，若查找到了，则调用相应对象中的方法解析(parse)请求（多态的应用），并在服务端完成响应。
+  *   Parse方法，是虚函数，不同的请求头对应了不同的解析方法，因此需要各任务派生类重写。
+  *   ResCMD方法，若calls里没有注册该请求，则回复一个OK 200
+  *  Read、Write、Event和SetCallback相当于封装了libevent里的setcb函数，设置为虚函数，让不同功能的子类只需要继承父类，再实现不同的回调函数即可。
     
 	
   

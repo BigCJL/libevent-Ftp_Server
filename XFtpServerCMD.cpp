@@ -49,7 +49,7 @@ void XFtpServerCMD::Read(struct bufferevent* bev)
 		if (calls.find(type) != calls.end())
 		{
 			XFtpTask* t = calls[type];
-			t->cmdbev = bev;
+			t->cmdTask = this;   //用来处理回复命令和目录
 			t->Parse(type, data);
 		}
 		else
@@ -93,6 +93,7 @@ bool XFtpServerCMD::Init()
 	//监听socket bufferevent
 	//base socket
 	bufferevent *bev = bufferevent_socket_new(base, sock, BEV_OPT_CLOSE_ON_FREE);  //base在子线程里的Setup初始化了
+	this->bev = bev;
 	this->SetCallback(bev);
 
 	//添加超时 

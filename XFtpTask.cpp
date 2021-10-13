@@ -1,12 +1,16 @@
 #include "XFtpTask.h"
 #include <event2/event.h>
 #include <event2/bufferevent.h>
+#include <iostream>
 using namespace std;
 //»Ø¸´cmdÏûÏ¢
 void XFtpTask::ResCMD(string msg)
 {
-	if (!cmdbev) return;
-	bufferevent_write(cmdbev, msg.c_str(), msg.size());
+	if (!cmdTask || !cmdTask->bev) return;
+	cout << "ResCMD:" << msg << endl;
+	if (msg[msg.size() - 1] != '\n')
+		msg += "\r\n";
+	bufferevent_write(cmdTask->bev, msg.c_str(), msg.size());
 }
 
 void XFtpTask::SetCallback(struct bufferevent* bev)

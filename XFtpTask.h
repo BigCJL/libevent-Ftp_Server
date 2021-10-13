@@ -4,7 +4,17 @@
 class XFtpTask : public XTask
 {
 public:
-	struct bufferevent* cmdbev = 0;
+
+	std::string curDir = "/";
+	std::string rootDir = ".";
+
+	//PORT 数据通道的ip和端口
+	std::string ip = "";
+	int port = 0;
+
+	//命令通道
+	XFtpTask* cmdTask = 0;
+
 	//解析协议
 	virtual void Parse(std::string type, std::string msg){}
 	//回复cmd消息
@@ -19,6 +29,6 @@ protected:
 	static void WriteCB(bufferevent* bev, void* arg);
 	static void EventCB(struct bufferevent* bev, short what, void* arg);
 	//命令bev
-
+	struct bufferevent* bev = 0;
 };
 

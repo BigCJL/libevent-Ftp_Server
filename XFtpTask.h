@@ -19,6 +19,15 @@ public:
 	virtual void Parse(std::string type, std::string msg){}
 	//回复cmd消息
 	void ResCMD(std::string msg);
+	
+
+	//用来发送建立了连接的数据通道
+	void Send(std::string data);
+	void Send(const char* data, int datasize);
+
+	//连接数据通道
+	void ConnectPORT();
+	void Close();
 	virtual void Read(struct bufferevent *bev){}
 	virtual void Write(struct bufferevent* bev) {}
 	virtual void Event(struct bufferevent* bev, short what) {}
@@ -30,5 +39,6 @@ protected:
 	static void EventCB(struct bufferevent* bev, short what, void* arg);
 	//命令bev
 	struct bufferevent* bev = 0;
+	FILE* fp = 0;
 };
 

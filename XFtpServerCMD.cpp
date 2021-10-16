@@ -24,6 +24,8 @@ void XFtpServerCMD::Reg(std::string cmd, XFtpTask* call)
 		return;
 	}
 	calls[cmd] = call;
+	//用来做空间清理
+	calls_del[call] = 0;
 }
 
 //子线程XThread event事件分发
@@ -49,8 +51,17 @@ void XFtpServerCMD::Read(struct bufferevent* bev)
 		if (calls.find(type) != calls.end())
 		{
 			XFtpTask* t = calls[type];
+			t->ip = ip;
+			t->port = port;
+			t->base = base;
 			t->cmdTask = this;   //用来处理回复命令和目录
 			t->Parse(type, data);
+			if (type == "PORT")   //这样做代码耦合度变高,暂时按这个方案
+			{
+				ip = t->ip;
+				port = t->port;
+			}
+
 		}
 		else
 		{
@@ -77,12 +88,9 @@ void XFtpServerCMD::Event(struct bufferevent* bev, short what)
 	if (what & (BEV_EVENT_EOF | BEV_EVENT_ERROR | BEV_EVENT_TIMEOUT))
 	{
 		cout << "BEV_EVENT_EOF | BEV_EVENT_ERROR" << endl;
-		bufferevent_free(bev);
 		delete this;
 	}
 }
-
-
 
 
 
@@ -93,6 +101,11 @@ bool XFtpServerCMD::Init()
 	//监听socket bufferevent
 	//base socket
 	bufferevent *bev = bufferevent_socket_new(base, sock, BEV_OPT_CLOSE_ON_FREE);  //base在子线程里的Setup初始化了
+	if (!bev)
+	{
+		delete this;
+		return false;
+	}
 	this->bev = bev;
 	this->SetCallback(bev);
 
@@ -104,4 +117,14 @@ bool XFtpServerCMD::Init()
 	bufferevent_write(bev, msg.c_str(), msg.size());
 
 	return true;
+}
+
+XFtpServerCMD::~XFtpServerCMD()
+{
+	Close();
+	for (auto ptr = calls_del.begin(); ptr != calls_del.end(); ptr++)
+	{
+		ptr->first->Close();
+		delete ptr->first;
+	}
 }

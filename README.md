@@ -1,7 +1,31 @@
 ## 基于libevent实现的线程池以及高并发Ftp服务器
 * 本项目基于之前的test_thread_pool,将线程池应用到Ftp服务器里，实现高并发。整套代码在linux和windows环境下均可运行，并部署到阿里云服务器测试。
 * 大量应用了C++11的新特性，面向对象风格。
-  
+* 实现了"USER","PWD","STOR","PORT","LIST","RETR"等命令。
+* 使用的filezilla作为ftp客户端测试，可以正常上传下载文件，并访问远程目录。
+* 并发压力测试（待续）...
+
+
+## 食用方法
+* **依赖库：libevent2.1.8**
+
+***
+**使用linux**
+* 我的linux用的ubuntu20.04,需要开放20、21端口，运行以下命令：
+```
+git clone https://github.com/BigCJL/libevent-Ftp_Server
+sudo ufw allow 20
+sudo ufw allow 21
+sudo ufw reload
+make
+```
+***
+**使用window**
+* 本地ide里添加工程，把文件添加到工程里直接运行即可。
+* vs里会因为使用fopen报warning,需要在预编译头里添加忽略warning的宏。
+***
+看到thread_poll_init_success的提示后，使用ftp客户端连接即可，我使用的filezilla做测试，可以正常上传下载文件。
+***
 ### 线程池部分
 ...
 
@@ -20,7 +44,9 @@ Xtask类是所有任务都依赖的基类，定义了成员	:
 * 定义了bool类型的Init纯虚函数，要求所有派生类实现自己的初始化方法，每个派生类初始化的方法对应着其不同的业务需求，将多态大量地应用到项目里。
 
 ### XFtpFactory类
-* 工厂类，采用单例模式。每收到一个连接，就调用CreateTask()方法，创建一个ftp消息处理对象，在该方法里注册有不同的请求头，对应不同的处理函数。
+* 采用单例化的工厂模式，在一个Factory类中对FTP服务命令进行注册到一个map中：
+* 	std::map<std::string, XFtpTask*>calls   //map的结构
+* map的第一个元素是服务命令的字符串("USER","STOR"等)，第二个元素是XFtpTask对象的指针，这个对象通过重载XTask类里的write、read、event来实现不同的命令行为。
 * 完成了USER,LIST...等请求的响应，分别对应不同的对象来进行实现，每个对象用父类XFtpTask的指针调用parse解析请求和完成处理。
 
 

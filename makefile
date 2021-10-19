@@ -1,4 +1,4 @@
-test_thread_pool:test_thread_pool.cpp XThreadPool.cpp XThread.cpp XFtpServerCMD.cpp
+test_thread_pool:test_thread_pool.cpp XThreadPool.cpp XThread.cpp XFtpServerCMD.cpp 
 	g++ $^ -o $@ -levent -lpthread
 	./$@
 clean:

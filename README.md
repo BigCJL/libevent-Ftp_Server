@@ -1,3 +1,18 @@
+## Usage
+the port 21 and 20 is needed to be open.
+Execute the following statement:
+```
+git clone https://github.com/BigCJL/libevent-Ftp_Server
+sudo ufw allow 20
+sudo ufw allow 21
+sudo ufw reload
+make
+./Ftp_Server
+```
+then, you can establish a connection using a Ftp client side to your server.
+***
+
+
 ## 基于libevent实现的线程池以及高并发Ftp服务器
 * 本项目基于之前的test_thread_pool,将线程池应用到Ftp服务器里，实现高并发。整套代码在linux和windows环境下均可运行，并部署到阿里云服务器测试。
 * 大量应用了C++11的新特性，面向对象风格。

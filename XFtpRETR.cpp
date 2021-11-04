@@ -41,6 +41,7 @@ void XFtpRETR::Parse(std::string type, std::string msg)
 	string filename = msg.substr(pos, msg.size() - pos - 2);
 	string path = cmdTask->rootDir;
 	path += cmdTask->curDir;
+	path += "/";
 	path += filename;
 	fp = fopen(path.c_str(), "rb");
 	if (fp)
